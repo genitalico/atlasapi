@@ -5,5 +5,9 @@
     <ReleaseVersion>0.1.0</ReleaseVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.10.2" />
+  </ItemGroup>
+
 
 </Project>
