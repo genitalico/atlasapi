@@ -31,14 +31,14 @@ namespace atlasapi.mongodb
         {
             try
             {
-                var collection = this._MongoDatabase.GetCollection<UrlShortenedModel>(this._MongoCollection);
+                var collection = this._MongoDatabase.GetCollection<UrlShortenedModelDb>(this._MongoCollection);
 
-                var doc = new UrlShortenedModel()
+                var doc = new UrlShortenedModelDb()
                 {
                     url = url,
+                    obj = (int)OBJ_DOCUMENT.SHORT_URL,
                     short_code = Tools.GetAlphanumericRandom(this._SizeCode),
-                    created_date = DateTime.UtcNow,
-                    visit_count = 0
+                    created_date = DateTime.UtcNow
                 };
 
                 await collection.InsertOneAsync(doc);
