@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using atlasapi.mongodb;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +26,16 @@ namespace atlasapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var cs = Configuration["MongoConnectionString"].ToString();
+            var dbName = Configuration["MongoDatabaseName"].ToString();
+            var collection1 = Configuration["MongoCollection"].ToString();
+            var sizeCode = Convert.ToInt32(Configuration["SizeCode"].ToString());
+
+            services.AddSingleton<IMongoTransaction, MongoTransaction>(x =>
+            {
+                return new MongoTransaction(cs,dbName,collection1,sizeCode);
+            });
+
             services.AddControllers();
         }
 
