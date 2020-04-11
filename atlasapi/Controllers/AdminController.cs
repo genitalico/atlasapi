@@ -14,7 +14,7 @@ namespace atlasapi.Controllers
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
-        #region MyRegion
+        #region Const
         private const string _POST_NEW_URL_TRACE = "PostNewUrl";
         #endregion
 
