@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Threading.Tasks;
-using atlasapi.Helpers;
 using atlasapi.Models;
-using MongoDB.Bson;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
 namespace atlasapi.mongodb
 {
     public class MongoTransaction : IMongoTransaction
     {
+        #region Const
+        private const string _INSERT_NEW_URL_TRACE = "MongoTransaction, InsertUrl";
+        #endregion
+
         #region PrivateVars
         private MongoClient _MongoClient;
         private IMongoDatabase _MongoDatabase;
         private string _MongoCollection;
-        private int _SizeCode;
         #endregion
 
-        public MongoTransaction(string cs,string dbName,string collection,int sizeCode)
+        public MongoTransaction(string cs,string dbName,string collection)
         {
             this._MongoCollection = collection;
-            this._SizeCode = sizeCode;
 
             this._MongoClient = new MongoClient(cs);
 
@@ -27,27 +28,29 @@ namespace atlasapi.mongodb
         }
 
         #region PublicMethods
-        public async Task<bool> InsertUrl(string url)
+        public async Task<Tuple<bool, string>> InsertUrl(UrlShortenedModelDb model, ILogger logger)
         {
             try
             {
+                logger.Log(LogLevel.Information, _INSERT_NEW_URL_TRACE);
+
                 var collection = this._MongoDatabase.GetCollection<UrlShortenedModelDb>(this._MongoCollection);
 
-                var doc = new UrlShortenedModelDb()
-                {
-                    url = url,
-                    obj = (int)OBJ_DOCUMENT.SHORT_URL,
-                    short_code = Tools.GetAlphanumericRandom(this._SizeCode),
-                    created_date = DateTime.UtcNow
-                };
+                await collection.InsertOneAsync(model);
 
-                await collection.InsertOneAsync(doc);
+                return new Tuple<bool, string>(true, model.short_code);
+            }
+            catch(MongoWriteException ex)
+            {
+                logger.Log(LogLevel.Critical, ex, _INSERT_NEW_URL_TRACE);
 
-                return true;
+                return new Tuple<bool, string>(false, "");
             }
             catch(Exception ex)
             {
-                return false;
+                logger.Log(LogLevel.Critical,ex,_INSERT_NEW_URL_TRACE);
+
+                return new Tuple<bool, string>(false, "");
             }
         }
         #endregion
