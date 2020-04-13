@@ -22,7 +22,7 @@ namespace atlasapi.Controllers
         private readonly ILogger<AdminController> _Logger;
         private readonly IMongoTransaction _MongoTransaction;
         private TransactionCore _TransactionCore;
-        private IAdminTransaction _AdminTransaction;
+        private readonly IAdminTransaction _AdminTransaction;
         #endregion
 
         #region Ctor
