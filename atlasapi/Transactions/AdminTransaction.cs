@@ -19,7 +19,7 @@ namespace atlasapi.Transactions
         #region PrivateVars
         private IMongoTransaction _MongoTransaction;
         private IConfiguration _Configuration;
-        private ILogger<AdminController> _Logger;
+        private ILogger _Logger;
         #endregion
 
         #region Ctor
@@ -27,6 +27,12 @@ namespace atlasapi.Transactions
         {
             this._MongoTransaction = mongoTransaction;
             this._Configuration = configuration;
+            this._Logger = logger;
+        }
+
+        public AdminTransaction(IMongoTransaction mongoTransaction, ILogger<IndexController> logger)
+        {
+            this._MongoTransaction = mongoTransaction;
             this._Logger = logger;
         }
         #endregion
@@ -68,6 +74,20 @@ namespace atlasapi.Transactions
                 this._Logger.Log(LogLevel.Critical, ex, _GENERATE_SHORT_URL_TRACE);
 
                 return new Tuple<bool, ResponsePostNewUrlModel>(false, null);
+            }
+        }
+
+        public async Task<Tuple<bool,string>> ResponseRealUrl(string shortCode)
+        {
+            try
+            {
+                var result = await this._MongoTransaction.FindShortCode(shortCode);
+
+                return result;
+            }
+            catch(Exception ex)
+            {
+                return new Tuple<bool, string>(false, "");
             }
         }
         #endregion
