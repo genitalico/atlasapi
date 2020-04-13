@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using atlasapi.Helpers;
 using atlasapi.Models;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -51,6 +52,26 @@ namespace atlasapi.mongodb
                 logger.Log(LogLevel.Critical,ex,_INSERT_NEW_URL_TRACE);
 
                 return new Tuple<bool, string>(false, "");
+            }
+        }
+
+        public async Task<Tuple<bool,string>> FindShortCode(string shortCode)
+        {
+            try
+            {
+                var filter = Builders<UrlShortenedModelDb>.Filter.Eq("obj", (int)OBJ_DOCUMENT.SHORT_URL);
+                var filter2 = Builders<UrlShortenedModelDb>.Filter.Eq("short_code", shortCode);
+                var filter3 = Builders<UrlShortenedModelDb>.Filter.And(filter,filter2);
+
+                var collection = this._MongoDatabase.GetCollection<UrlShortenedModelDb>(this._MongoCollection);
+
+                var document = await collection.Find(filter3).FirstOrDefaultAsync();
+
+                return new Tuple<bool, string>(true, document.url);
+            }
+            catch(Exception ex)
+            {
+                return new Tuple<bool, string>(false,"");
             }
         }
         #endregion

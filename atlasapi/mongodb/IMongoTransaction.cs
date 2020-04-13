@@ -8,5 +8,6 @@ namespace atlasapi.mongodb
     public interface IMongoTransaction
     {
         Task<Tuple<bool, string>> InsertUrl(UrlShortenedModelDb model, ILogger logger);
+        Task<Tuple<bool, string>> FindShortCode(string shortCode);
     }
 }
