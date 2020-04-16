@@ -34,6 +34,19 @@ namespace atlasapi.Controllers
 
         #region REST
         [HttpGet]
+        [Route("")]
+        public async Task<ContentResult> Index()
+        {
+            this._TransactionCore = new TransactionCore();
+
+            this._TransactionCore.CommonModel.Correct();
+
+            this._TransactionCore.OkResponse();
+
+            return this._TransactionCore.ContentResult;
+        }
+
+        [HttpGet]
         [Route("{ShortCode}")]
         public async Task<IActionResult> Redirect([FromRoute] string ShortCode)
         {
