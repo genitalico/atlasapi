@@ -1,5 +1,7 @@
 # Acortador de URL. Proyecto Atlas
 
+[Informacion Adicional - 80bits.blog](http://80bits.blog/index.php/2020/04/16/atlas-proyecto-acortador-de-url/)
+
 ## Configuraciones
 
 En el archivo appsettings.json
