@@ -1,8 +1,12 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace atlasapi.Models
 {
     public class PostNewUrlModel
     {
+        [Required]
+        [Url]
         public string url { get; set; }
     }
 

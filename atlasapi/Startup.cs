@@ -2,6 +2,7 @@ using System;
 using atlasapi.mongodb;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,7 +34,12 @@ namespace atlasapi
 
             services.AddSingleton<IMongoTransaction, MongoTransaction>(x =>
             {
-                return new MongoTransaction(cs,dbName,collection1);
+                return new MongoTransaction(cs, dbName, collection1);
+            });
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
             });
 
             services.AddControllers();

@@ -1,12 +1,18 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using atlasapi.ITransactions;
 using atlasapi.Models;
 using atlasapi.mongodb;
 using atlasapi.Transactions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using webServiceTools;
+using System;
+using System.IO;
+using System.Text;
 
 namespace atlasapi.Controllers
 {
@@ -32,7 +38,7 @@ namespace atlasapi.Controllers
 
             this._MongoTransaction = mongoTransaction;
 
-            this._AdminTransaction = new AdminTransaction(this._MongoTransaction, configuration,logger);
+            this._AdminTransaction = new AdminTransaction(this._MongoTransaction, configuration, logger);
         }
         #endregion
 
@@ -43,9 +49,19 @@ namespace atlasapi.Controllers
         {
             this._Logger.Log(LogLevel.Information, _POST_NEW_URL_TRACE);
 
-            var result = await this._AdminTransaction.GenerateShortUrl(model.url);
-
             this._TransactionCore = new TransactionCore();
+
+            if (!ModelState.IsValid)
+            {
+                this._TransactionCore.CommonModel.InvalidModel();
+                this._TransactionCore.OkResponse();
+
+                this._Logger.Log(LogLevel.Information, _POST_NEW_URL_TRACE);
+
+                return this._TransactionCore.ContentResult;
+            }
+
+            var result = await this._AdminTransaction.GenerateShortUrl(model.url);
 
             if (result.Item1)
             {
