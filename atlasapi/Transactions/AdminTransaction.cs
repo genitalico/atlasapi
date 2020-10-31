@@ -38,7 +38,7 @@ namespace atlasapi.Transactions
         #endregion
 
         #region PublicMethods
-        public async Task<Tuple<bool,ResponsePostNewUrlModel>> GenerateShortUrl(string url)
+        public async Task<Tuple<bool, ResponsePostNewUrlModel>> GenerateShortUrl(string url)
         {
             try
             {
@@ -56,11 +56,12 @@ namespace atlasapi.Transactions
 
                 var result = await this._MongoTransaction.InsertUrl(doc, this._Logger);
 
-                if(result.Item1)
+                if (result.Item1)
                 {
                     var response = new ResponsePostNewUrlModel()
                     {
-                        short_url = doc.short_code
+                        short_url = doc.short_code,
+                        url = url
                     };
 
                     return new Tuple<bool, ResponsePostNewUrlModel>(true, response);
@@ -69,7 +70,7 @@ namespace atlasapi.Transactions
                 return new Tuple<bool, ResponsePostNewUrlModel>(false, null);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this._Logger.Log(LogLevel.Critical, ex, _GENERATE_SHORT_URL_TRACE);
 
@@ -77,7 +78,7 @@ namespace atlasapi.Transactions
             }
         }
 
-        public async Task<Tuple<bool,string>> ResponseRealUrl(string shortCode)
+        public async Task<Tuple<bool, string>> ResponseRealUrl(string shortCode)
         {
             try
             {
@@ -85,7 +86,7 @@ namespace atlasapi.Transactions
 
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new Tuple<bool, string>(false, "");
             }

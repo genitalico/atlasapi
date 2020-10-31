@@ -9,5 +9,7 @@ namespace atlasapi.Models
     public class ResponsePostNewUrlModel
     {
         public string short_url { get; set; }
+
+        public string url { get; set; }
     }
 }
