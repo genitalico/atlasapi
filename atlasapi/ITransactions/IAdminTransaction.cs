@@ -12,5 +12,7 @@ namespace atlasapi.ITransactions
         Task<Tuple<bool, string>> ResponseRealUrl(string shortCode);
 
         Task<Tuple<bool, List<ResponsePostNewUrlModel>>> UploadBulk(Stream stream);
+
+        Task<Tuple<bool, List<ResponsePostNewUrlModel>>> GetAll();
     }
 }

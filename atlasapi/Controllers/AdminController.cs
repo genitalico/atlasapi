@@ -98,7 +98,7 @@ namespace atlasapi.Controllers
 
             Console.WriteLine(file[0].ContentType);
 
-            if(file[0].ContentType != "text/plain")
+            if (file[0].ContentType != "text/plain")
             {
                 this._TransactionCore.CommonModel.InvalidModel();
                 this._TransactionCore.OkResponse();
@@ -111,6 +111,32 @@ namespace atlasapi.Controllers
             if (result.Item1)
             {
                 this._TransactionCore.CommonModel.RegisterCreated();
+
+                this._TransactionCore.CommonModel.content = result.Item2;
+
+                this._TransactionCore.OkResponse();
+
+                return this._TransactionCore.ContentResult;
+            }
+
+            this._TransactionCore.CommonModel.InternalError();
+            this._TransactionCore.OkResponse();
+
+            return this._TransactionCore.ContentResult;
+        }
+
+        [HttpGet]
+        [Route("list")]
+        public async Task<ContentResult> GetAll()
+        {
+            this._TransactionCore = new TransactionCore();
+
+            var result = await this._AdminTransaction.GetAll();
+
+
+            if (result.Item1)
+            {
+                this._TransactionCore.CommonModel.Correct();
 
                 this._TransactionCore.CommonModel.content = result.Item2;
 

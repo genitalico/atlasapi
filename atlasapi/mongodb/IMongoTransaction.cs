@@ -12,5 +12,7 @@ namespace atlasapi.mongodb
         Task<Tuple<bool, string>> FindShortCode(string shortCode);
 
         Task<Tuple<bool,string>> InsertBulkUrls(List<UrlShortenedModelDb> urls);
+
+        Task<Tuple<bool, List<ResponsePostNewUrlModel>>> GetAll();
     }
 }

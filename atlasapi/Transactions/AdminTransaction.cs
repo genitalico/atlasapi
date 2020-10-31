@@ -163,6 +163,25 @@ namespace atlasapi.Transactions
                 return new Tuple<bool, List<ResponsePostNewUrlModel>>(false, new List<ResponsePostNewUrlModel>());
             }
         }
+
+        public async Task<Tuple<bool, List<ResponsePostNewUrlModel>>> GetAll()
+        {
+            try
+            {
+                var result = await this._MongoTransaction.GetAll();
+
+                if(result.Item1)
+                {
+                    return new Tuple<bool, List<ResponsePostNewUrlModel>>(true, result.Item2);
+                }
+
+                return new Tuple<bool, List<ResponsePostNewUrlModel>>(false, new List<ResponsePostNewUrlModel>());
+            }   
+            catch(Exception ex)
+            {
+                return new Tuple<bool, List<ResponsePostNewUrlModel>>(false, new List<ResponsePostNewUrlModel>());
+            }
+        }
         #endregion
     }
 }

@@ -20,7 +20,7 @@ namespace atlasapi.mongodb
         private string _MongoCollection;
         #endregion
 
-        public MongoTransaction(string cs,string dbName,string collection)
+        public MongoTransaction(string cs, string dbName, string collection)
         {
             this._MongoCollection = collection;
 
@@ -42,27 +42,27 @@ namespace atlasapi.mongodb
 
                 return new Tuple<bool, string>(true, model.short_code);
             }
-            catch(MongoWriteException ex)
+            catch (MongoWriteException ex)
             {
                 logger.Log(LogLevel.Critical, ex, _INSERT_NEW_URL_TRACE);
 
                 return new Tuple<bool, string>(false, "");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.Log(LogLevel.Critical,ex,_INSERT_NEW_URL_TRACE);
+                logger.Log(LogLevel.Critical, ex, _INSERT_NEW_URL_TRACE);
 
                 return new Tuple<bool, string>(false, "");
             }
         }
 
-        public async Task<Tuple<bool,string>> FindShortCode(string shortCode)
+        public async Task<Tuple<bool, string>> FindShortCode(string shortCode)
         {
             try
             {
                 var filter = Builders<UrlShortenedModelDb>.Filter.Eq("obj", (int)OBJ_DOCUMENT.SHORT_URL);
                 var filter2 = Builders<UrlShortenedModelDb>.Filter.Eq("short_code", shortCode);
-                var filter3 = Builders<UrlShortenedModelDb>.Filter.And(filter,filter2);
+                var filter3 = Builders<UrlShortenedModelDb>.Filter.And(filter, filter2);
 
                 var collection = this._MongoDatabase.GetCollection<UrlShortenedModelDb>(this._MongoCollection);
 
@@ -70,13 +70,13 @@ namespace atlasapi.mongodb
 
                 return new Tuple<bool, string>(true, document.url);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return new Tuple<bool, string>(false,"");
+                return new Tuple<bool, string>(false, "");
             }
         }
 
-        public async Task<Tuple<bool,string>> InsertBulkUrls(List<UrlShortenedModelDb> urls)
+        public async Task<Tuple<bool, string>> InsertBulkUrls(List<UrlShortenedModelDb> urls)
         {
             try
             {
@@ -84,11 +84,43 @@ namespace atlasapi.mongodb
 
                 await collection.InsertManyAsync(urls);
 
-                return new Tuple<bool, string>(true,"");
+                return new Tuple<bool, string>(true, "");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return new Tuple<bool, string>(false,"");
+                return new Tuple<bool, string>(false, "");
+            }
+        }
+
+        public async Task<Tuple<bool, List<ResponsePostNewUrlModel>>> GetAll()
+        {
+            try
+            {
+                var collection = this._MongoDatabase.GetCollection<UrlShortenedModelDb>(this._MongoCollection);
+
+                var filter = Builders<UrlShortenedModelDb>.Filter.Eq("obj", (int)OBJ_DOCUMENT.SHORT_URL);
+                var documents = await collection.FindAsync(filter);
+
+                var documents2 = await documents.ToListAsync();
+
+                var documents3 = new List<ResponsePostNewUrlModel>();
+
+                foreach(var doc in documents2)
+                {
+                    var model = new ResponsePostNewUrlModel
+                    {
+                        url = doc.url,
+                        short_url = doc.short_code
+                    };
+
+                    documents3.Add(model);
+                }
+
+                return new Tuple<bool, List<ResponsePostNewUrlModel>>(true, documents3);
+            }
+            catch (Exception ex)
+            {
+                return new Tuple<bool, List<ResponsePostNewUrlModel>>(false, new List<ResponsePostNewUrlModel>());
             }
         }
         #endregion
