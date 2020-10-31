@@ -42,6 +42,15 @@ namespace atlasapi
                 options.SuppressModelStateInvalidFilter = true;
             });
 
+            services.AddCors(opt => 
+            {
+                opt.AddDefaultPolicy(
+                    builder => {
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    }
+                );
+            });
+
             services.AddControllers();
         }
 
@@ -58,6 +67,8 @@ namespace atlasapi
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
