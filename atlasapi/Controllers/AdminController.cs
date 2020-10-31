@@ -81,6 +81,49 @@ namespace atlasapi.Controllers
 
             return this._TransactionCore.ContentResult;
         }
+
+        [HttpPost]
+        [Route("bulkUrl")]
+        public async Task<ContentResult> BulkUrl(List<IFormFile> file)
+        {
+            this._TransactionCore = new TransactionCore();
+
+            if (file.Count < 1)
+            {
+                this._TransactionCore.CommonModel.InvalidModel();
+                this._TransactionCore.OkResponse();
+
+                return this._TransactionCore.ContentResult;
+            }
+
+            Console.WriteLine(file[0].ContentType);
+
+            if(file[0].ContentType != "text/plain")
+            {
+                this._TransactionCore.CommonModel.InvalidModel();
+                this._TransactionCore.OkResponse();
+
+                return this._TransactionCore.ContentResult;
+            }
+
+            var result = await this._AdminTransaction.UploadBulk(file[0].OpenReadStream());
+
+            if (result.Item1)
+            {
+                this._TransactionCore.CommonModel.RegisterCreated();
+
+                this._TransactionCore.CommonModel.content = result.Item2;
+
+                this._TransactionCore.OkResponse();
+
+                return this._TransactionCore.ContentResult;
+            }
+
+            this._TransactionCore.CommonModel.InternalError();
+            this._TransactionCore.OkResponse();
+
+            return this._TransactionCore.ContentResult;
+        }
         #endregion
     }
 }

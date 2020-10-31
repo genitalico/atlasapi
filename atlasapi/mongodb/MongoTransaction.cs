@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using atlasapi.Helpers;
 using atlasapi.Models;
@@ -68,6 +69,22 @@ namespace atlasapi.mongodb
                 var document = await collection.Find(filter3).FirstOrDefaultAsync();
 
                 return new Tuple<bool, string>(true, document.url);
+            }
+            catch(Exception ex)
+            {
+                return new Tuple<bool, string>(false,"");
+            }
+        }
+
+        public async Task<Tuple<bool,string>> InsertBulkUrls(List<UrlShortenedModelDb> urls)
+        {
+            try
+            {
+                var collection = this._MongoDatabase.GetCollection<UrlShortenedModelDb>(this._MongoCollection);
+
+                await collection.InsertManyAsync(urls);
+
+                return new Tuple<bool, string>(true,"");
             }
             catch(Exception ex)
             {

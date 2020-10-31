@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using atlasapi.Controllers;
 using atlasapi.Helpers;
@@ -89,6 +94,73 @@ namespace atlasapi.Transactions
             catch (Exception ex)
             {
                 return new Tuple<bool, string>(false, "");
+            }
+        }
+
+        public async Task<Tuple<bool, List<ResponsePostNewUrlModel>>> UploadBulk(Stream stream)
+        {
+            try
+            {
+                this._Logger.Log(LogLevel.Information, _GENERATE_SHORT_URL_TRACE);
+
+                var result = new StringBuilder();
+
+                using (var reader = new StreamReader(stream))
+                {
+                    while (reader.Peek() >= 0)
+                        result.AppendLine(await reader.ReadLineAsync());
+                };
+
+                var urlsArr = result.ToString().Split("\n");
+
+                var urls = urlsArr.ToList();
+
+                var sizeCode = Convert.ToInt32(this._Configuration["SizeCode"].ToString());
+
+                var listUrls = new List<UrlShortenedModelDb>();
+                var responseUrls = new List<ResponsePostNewUrlModel>();
+
+                foreach (var url in urls)
+                {
+                    if (url == "")
+                        continue;
+
+                    var model = new PostNewUrlModel();
+                    model.url = url;
+
+                    var results = new List<ValidationResult>();
+                    var context = new ValidationContext(model, null, null);
+                    if (!Validator.TryValidateObject(model, context, results, true))
+                    {
+                        return new Tuple<bool, List<ResponsePostNewUrlModel>>(false, new List<ResponsePostNewUrlModel>());
+                    }
+
+                    var doc = new UrlShortenedModelDb()
+                    {
+                        url = url,
+                        obj = (int)OBJ_DOCUMENT.SHORT_URL,
+                        short_code = Tools.GetAlphanumericRandom(sizeCode),
+                        created_date = DateTime.UtcNow
+                    };
+
+                    var res = new ResponsePostNewUrlModel
+                    {
+                        url = doc.url,
+                        short_url = doc.short_code
+                    };
+
+                    responseUrls.Add(res);
+
+                    listUrls.Add(doc);
+                }
+
+                var resultMongoTransaction = await this._MongoTransaction.InsertBulkUrls(listUrls);
+
+                return new Tuple<bool, List<ResponsePostNewUrlModel>>(true, responseUrls);
+            }
+            catch (Exception ex)
+            {
+                return new Tuple<bool, List<ResponsePostNewUrlModel>>(false, new List<ResponsePostNewUrlModel>());
             }
         }
         #endregion

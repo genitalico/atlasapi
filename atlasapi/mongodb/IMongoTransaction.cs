@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using atlasapi.Models;
 using Microsoft.Extensions.Logging;
@@ -9,5 +10,7 @@ namespace atlasapi.mongodb
     {
         Task<Tuple<bool, string>> InsertUrl(UrlShortenedModelDb model, ILogger logger);
         Task<Tuple<bool, string>> FindShortCode(string shortCode);
+
+        Task<Tuple<bool,string>> InsertBulkUrls(List<UrlShortenedModelDb> urls);
     }
 }
