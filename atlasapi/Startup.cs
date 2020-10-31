@@ -20,10 +20,16 @@ namespace atlasapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var cs = Configuration["MongoConnectionString"].ToString();
-            var dbName = Configuration["MongoDatabaseName"].ToString();
-            var collection1 = Configuration["MongoCollection"].ToString();
+            var cs = Environment.GetEnvironmentVariable("MONGO_CS");
+            var dbName = Environment.GetEnvironmentVariable("MONGO_DBNAME");
+            var collection1 = Environment.GetEnvironmentVariable("MONGO_COLLECTION");
+            var dbPassword = Environment.GetEnvironmentVariable("MONGO_PASSWORD");
+            var dbUser = Environment.GetEnvironmentVariable("MONGO_USER");
             var sizeCode = Convert.ToInt32(Configuration["SizeCode"].ToString());
+
+            var split = cs.Split("//");
+
+            cs = split[0] + "//" + dbUser + ":" + dbPassword + "@" + split[1] + "/" + dbName + "?authSource=admin";
 
             services.AddSingleton<IMongoTransaction, MongoTransaction>(x =>
             {
